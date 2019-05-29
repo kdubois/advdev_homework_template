@@ -125,9 +125,6 @@ podTemplate(
                                 rc = openshift.selector("rc", "tasks-${dc_version}").object()
                                 rc.status.phase == 'running'
                             }
-
-                            openshift.verifyService('tasks')
-
                         }
                     }
 
