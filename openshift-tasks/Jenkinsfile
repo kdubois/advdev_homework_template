@@ -175,7 +175,7 @@ podTemplate(
                     openshift.withCluster() {
                         openshift.withProject(prodProject) {
 
-                            activeApp = openshift.selector("route", "tasks").object().spec.to.name == "tasks-green" ? 'tasks-green' : 'tasks-blue'
+                            activeApp = openshift.selector("route", "tasks").object().spec.to.name
                             echo "The active app is ${activeApp}"
 
                             destApp = activeApp == 'tasks-green' ? 'tasks-blue' : 'tasks-green'
@@ -217,29 +217,9 @@ podTemplate(
             stage('Switch over to new Version') {
                 echo "Switching Production application to ${destApp}."
                 script {
-                    def userInput
-                    try {
-                        userInput = input(
-                                id: 'Proceed1', message: 'Deploy to Production?', parameters: [
-                                [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm are ready to deploy to production.']
-                        ])
-                    } catch (err) { // input false
-                        def user = err.getCauses()[0].getUser()
-                        userInput = false
-                        echo "Aborted by: [${user}]"
-                    }
-
-                    node {
-                        if (userInput == true) {
-                            echo "Executing production switch"
-                            openshift.withCluster() {
-                                openshift.withProject(prodProject) {
-                                    openshift.patch("route/tasks", "'{\"spec\":{\"to\":{\"name\":\"${activeApp}\"}}}'")
-                                }
-                            }
-                        } else {
-                            // do something else
-                            echo "Deploy To Production Aborted."
+                    openshift.withCluster() {
+                        openshift.withProject(prodProject) {
+                            openshift.patch("route/tasks", "'{\"spec\":{\"to\":{\"name\":\"${activeApp}\"}}}'")
                         }
                     }
                 }
