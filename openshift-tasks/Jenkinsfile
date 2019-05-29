@@ -175,9 +175,10 @@ podTemplate(
                     openshift.withCluster() {
                         openshift.withProject(prodProject) {
 
-                            activeApp = openshift.selector("route", "tasks").object().spec.to.name == "tasks-green"
+                            activeApp = openshift.selector("route", "tasks").object().spec.to.name == "tasks-green" ? 'tasks-green' : 'tasks-blue'
                             echo "The active app is ${activeApp}"
-                            destApp = activeApp == 'green' ? 'tasks-blue' : 'tasks-green'
+
+                            destApp = activeApp == 'tasks-green' ? 'tasks-blue' : 'tasks-green'
                             echo "We need to switch to ${destApp}"
 
                             echo "set image to ${localImgRegistry}/${devProject}/tasks:${prodTag}"
