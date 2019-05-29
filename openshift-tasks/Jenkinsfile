@@ -1,4 +1,6 @@
 #!groovy
+def GUID = "a594"
+
 podTemplate(
         label: "skopeo-pod",
         cloud: "openshift",
@@ -18,6 +20,8 @@ podTemplate(
         // Define Maven Command to point to the correct
         // settings for our Nexus installation
         def mvnCmd = "mvn -s ../nexus_settings.xml"
+        def devProject = "${GUID}-tasks-dev"
+        def prodProject = "${GUID}-tasks-prod"
 
         // Checkout Source Code.
         stage('Checkout Source') {
@@ -143,7 +147,7 @@ podTemplate(
                             "--src-creds openshift:\$(oc whoami -t) " +
                             "--dest-creds admin:admin123 " +
                             "docker://image-registry.openshift-image-registry.svc.cluster.local:5000/${devProject}/tasks:${devTag} " +
-                            "docker://nexus-registry-gpte-hw-cicd.apps.na311.openshift.opentlc.com/tasks:${prodTag}"
+                            "docker://nexus-registry-gpte-hw-cicd.apps.na311.openshift.opentlc.com/tasks-${GUID}:${prodTag}"
 
                     // Tag the built image with the production tag.
                     script {
