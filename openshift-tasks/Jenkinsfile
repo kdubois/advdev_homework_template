@@ -219,7 +219,7 @@ podTemplate(
                 script {
                     openshift.withCluster() {
                         openshift.withProject(prodProject) {
-                            openshift.patch("route/tasks", "'{\"spec\":{\"to\":{\"name\":\"${activeApp}\"}}}'")
+                            openshift.patch("route/tasks", "'{\"spec\":{\"to\":{\"name\":\"${destApp}\"}}}'")
                         }
                     }
                 }
