@@ -183,9 +183,9 @@ podTemplate(
 
                             echo "set image to ${localImgRegistry}/${devProject}/tasks:${prodTag}"
 
-                            openshift.set("env", "dc/tasks", "VERSION='${prodTag} (${destApp})'")
+                            openshift.set("image", "dc/${destApp}", "${destApp}=${localImgRegistry}/${devProject}/tasks:${prodTag}")
 
-                            openshift.set("image", "dc/" + destApp, "${destApp}=${localImgRegistry}/${devProject}/tasks:${prodTag}")
+                            openshift.set("env", "dc/${destApp}", "VERSION='${prodTag} (${destApp})'")
 
                             if (openshift.selector("configmap/${destApp}-config").exists()) {
                                 openshift.delete("configmap/${destApp}-config")
