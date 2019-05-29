@@ -1,5 +1,6 @@
 #!groovy
 def GUID = "a594"
+def localImgRegistry = "docker-registry.default.svc:5000"
 
 podTemplate(
         label: "skopeo-pod",
@@ -8,7 +9,7 @@ podTemplate(
         containers: [
                 containerTemplate(
                         name: "jnlp",
-                        image: "docker-registry.default.svc:5000/${GUID}-jenkins/jenkins-agent-appdev",
+                        image: "${localImgRegistry}/${GUID}-jenkins/jenkins-agent-appdev",
                         resourceRequestMemory: "1Gi",
                         resourceLimitMemory: "2Gi",
                         resourceRequestCpu: "1",
@@ -102,7 +103,7 @@ podTemplate(
                             def dc = openshift.selector("dc", "tasks").object()
                             def dc_version = dc.status.latestVersion
 
-                            openshift.set("image", "dc/tasks", "tasks=image-registry.openshift-image-registry.svc:5000/${devProject}/tasks:${devTag}")
+                            openshift.set("image", "dc/tasks", "tasks=${localImgRegistry}/${devProject}/tasks:${devTag}")
 
                             openshift.set("env", "dc/tasks", "VERSION='${devTag} (tasks-dev)'")
 
@@ -146,7 +147,7 @@ podTemplate(
                     sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false " +
                             "--src-creds openshift:\$(oc whoami -t) " +
                             "--dest-creds admin:admin123 " +
-                            "docker://image-registry.openshift-image-registry.svc.cluster.local:5000/${devProject}/tasks:${devTag} " +
+                            "docker://${localImgRegistry}/${devProject}/tasks:${devTag} " +
                             "docker://nexus-registry-gpte-hw-cicd.apps.na311.openshift.opentlc.com/tasks-${GUID}:${prodTag}"
 
                     // Tag the built image with the production tag.
@@ -182,11 +183,11 @@ podTemplate(
                             destApp = activeApp == 'green' ? 'tasks-blue' : 'tasks-green'
                             echo "We need to switch to ${destApp}"
 
-                            echo "set image to image-registry.openshift-image-registry.svc:5000/${devProject}/tasks:${prodTag}"
+                            echo "set image to ${localImgRegistry}/${devProject}/tasks:${prodTag}"
 
                             openshift.set("env", "dc/tasks", "VERSION='${prodTag} (${destApp})'")
 
-                            openshift.set("image", "dc/" + destApp, "${destApp}=image-registry.openshift-image-registry.svc:5000/${devProject}/tasks:${prodTag}")
+                            openshift.set("image", "dc/" + destApp, "${destApp}=${localImgRegistry}/${devProject}/tasks:${prodTag}")
 
                             if (openshift.selector("configmap/${destApp}-config").exists()) {
                                 openshift.delete("configmap/${destApp}-config")
