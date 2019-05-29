@@ -143,7 +143,7 @@ podTemplate(
                             "--src-creds openshift:\$(oc whoami -t) " +
                             "--dest-creds admin:admin123 " +
                             "docker://image-registry.openshift-image-registry.svc.cluster.local:5000/${devProject}/tasks:${devTag} " +
-                            "docker://nexus-registry-gpte-hw-cicd.apps.na311.openshift.opentlc.com/tasks-${GUID}:${prodTag}"
+                            "docker://nexus-registry-gpte-hw-cicd.apps.na311.openshift.opentlc.com/tasks:${prodTag}"
 
                     // Tag the built image with the production tag.
                     script {
