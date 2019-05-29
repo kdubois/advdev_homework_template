@@ -23,8 +23,8 @@ podTemplate(
         def mvnCmd = "mvn -s ../nexus_settings.xml"
         def devProject = "${GUID}-tasks-dev"
         def prodProject = "${GUID}-tasks-prod"
-        def nexusUser = admin
-        def nexusPw = redhat
+        def nexusUser = "admin"
+        def nexusPw = "redhat"
 
         // Checkout Source Code.
         stage('Checkout Source') {
