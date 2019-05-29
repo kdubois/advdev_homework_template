@@ -15,9 +15,9 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 # Set up Jenkins with sufficient resources
 oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi --param DISABLE_ADMINISTRATIVE_MONITORS=true
 
-oc set resources dc jenkins limits=memory=2Gi,cpu=2 requests=memory=1Gi,cpu=1
+oc set resources dc jenkins limits=memory=2Gi,cpu=2 requests=memory=1Gi,cpu=1 -n ${GUID}-jenkins
 
-oc set volume dc/jenkins --add --overwrite --name=jenkins-data --mount-path=/var/lib/jenkins --type persistentVolumeClaim --claim-name=${GUID}-jenkins-pvc --claim-size=4Gi
+oc set volume dc/jenkins --add --overwrite --name=jenkins-data --mount-path=/var/lib/jenkins --type persistentVolumeClaim --claim-name=${GUID}-jenkins-pvc --claim-size=4Gi -n ${GUID}-jenkins
 
 # Create custom agent container image with skopeo
 oc new-build -D $'FROM docker.io/openshift/jenkins-agent-maven-35-centos7:v3.11\n
