@@ -136,27 +136,25 @@ podTemplate(
             stage('Copy Image to Nexus container registry') {
                 echo "Copy image to Nexus container registry"
 
-                steps {
-                    echo "Copy image to Nexus Docker Registry"
 
-                    sh 'export CLUSTER=$(oc whoami --show-server | cut -d. -f2- | cut -d: -f1)'
+                echo "Copy image to Nexus Docker Registry"
 
-                    sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false " +
-                            "--src-creds openshift:\$(oc whoami -t) " +
-                            "--dest-creds admin:admin123 " +
-                            "docker://${localImgRegistry}/${devProject}/tasks:${devTag} " +
-                            "docker://nexus-registry-gpte-hw-cicd.apps.na311.openshift.opentlc.com/tasks-${GUID}:${prodTag}"
+                sh 'export CLUSTER=$(oc whoami --show-server | cut -d. -f2- | cut -d: -f1)'
 
-                    // Tag the built image with the production tag.
-                    script {
-                        openshift.withCluster() {
-                            openshift.withProject(devProject) {
-                                openshift.tag("tasks:${devTag}", "tasks:${prodTag}")
-                            }
+                sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false " +
+                        "--src-creds openshift:\$(oc whoami -t) " +
+                        "--dest-creds admin:admin123 " +
+                        "docker://${localImgRegistry}/${devProject}/tasks:${devTag} " +
+                        "docker://nexus-registry-gpte-hw-cicd.apps.na311.openshift.opentlc.com/tasks-${GUID}:${prodTag}"
+
+                // Tag the built image with the production tag.
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject(devProject) {
+                            openshift.tag("tasks:${devTag}", "tasks:${prodTag}")
                         }
                     }
                 }
-
 
             }
 
@@ -222,7 +220,7 @@ podTemplate(
                                 id: 'Proceed1', message: 'Deploy to Production?', parameters: [
                                 [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm are ready to deploy to production.']
                         ])
-                    } catch(err) { // input false
+                    } catch (err) { // input false
                         def user = err.getCauses()[0].getUser()
                         userInput = false
                         echo "Aborted by: [${user}]"
@@ -231,7 +229,7 @@ podTemplate(
                     node {
                         if (userInput == true) {
                             echo "Executing production switch"
-                            openshift.withCluster(){
+                            openshift.withCluster() {
                                 openshift.withProject(prodProject) {
                                     openshift.patch("route/tasks", "'{\"spec\":{\"to\":{\"name\":\"${activeApp}\"}}}'")
                                 }
