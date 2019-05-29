@@ -23,6 +23,8 @@ podTemplate(
         def mvnCmd = "mvn -s ../nexus_settings.xml"
         def devProject = "${GUID}-tasks-dev"
         def prodProject = "${GUID}-tasks-prod"
+        def nexusUser = admin
+        def nexusPw = redhat
 
         // Checkout Source Code.
         stage('Checkout Source') {
@@ -143,7 +145,7 @@ podTemplate(
 
                 sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false " +
                         "--src-creds openshift:\$(oc whoami -t) " +
-                        "--dest-creds admin:admin123 " +
+                        "--dest-creds ${nexusUser}:${nexusPw} " +
                         "docker://${localImgRegistry}/${devProject}/tasks:${devTag} " +
                         "docker://nexus-registry-gpte-hw-cicd.apps.na311.openshift.opentlc.com/tasks-${GUID}:${prodTag}"
 
